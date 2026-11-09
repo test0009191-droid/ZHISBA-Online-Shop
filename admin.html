@@ -17,7 +17,7 @@ h1{font:700 22px "Playfair Display",Georgia,serif;color:var(--rose);letter-spaci
 .btn{display:block;width:100%;background:var(--rose);color:#fff;padding:14px;border-radius:14px;font-weight:600;font-size:16px;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .btn:active{transform:scale(.97)}.btn.alt{background:var(--pink);color:var(--rose)}.btn.del{background:none;color:var(--err)}.btn:disabled{opacity:.55}
 .sm{padding:8px 14px;border-radius:12px;background:var(--pink);color:var(--rose);font-size:13.5px;font-weight:600}
-.seg{display:flex;background:var(--pink);border-radius:14px;padding:3px;margin-bottom:16px}.seg button{flex:1;padding:10px;border-radius:11px;font-weight:600;font-size:14px;color:var(--rose)}.seg button.on{background:var(--card)}
+.seg{display:flex;background:var(--pink);border-radius:14px;padding:3px;margin-bottom:16px}.seg button{flex:1;padding:10px 4px;border-radius:11px;font-weight:600;font-size:14px;color:var(--rose)}.seg button.on{background:var(--card)}
 .box{background:var(--card);border-radius:22px;padding:22px;margin-top:40px}.box p{color:var(--muted);font-size:14px;margin:8px 0}
 .f{margin:12px 0}.f label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 5px 4px}
 .f input,.f select,.f textarea{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
@@ -34,6 +34,7 @@ h1{font:700 22px "Playfair Display",Georgia,serif;color:var(--rose);letter-spaci
 .ord{background:var(--card);border-radius:18px;padding:14px;margin-bottom:10px;font-size:14px}.ord .h{display:flex;justify-content:space-between;font-weight:600}
 .ord small{display:block;color:var(--muted);margin-top:3px}.ord a{color:var(--rose);font-weight:600}.ord select{margin-top:10px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px}
 .tg{display:inline-block;background:var(--rose);color:#fff;border-radius:8px;padding:1px 8px;font-size:11.5px;margin-left:6px}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap}.tb{position:relative;width:74px;height:74px;border-radius:14px;background:var(--pink);overflow:hidden;display:grid;place-items:center}.tb img{width:100%;height:100%;object-fit:cover}.tb button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:11px}.tb.ad{color:var(--rose);font-size:30px;cursor:pointer}
 code{display:block;background:var(--pink);border-radius:12px;padding:12px;font-size:12.5px;word-break:break-all;margin:10px 0;color:var(--ink)}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:20}#toast.on{opacity:1;transform:translate(-50%,0)}
 </style>
@@ -45,7 +46,7 @@ const SUPABASE_URL="https://zhlstrmuhitimghyerrq.supabase.co", SUPABASE_ANON_KEY
 const sb=(SUPABASE_URL.startsWith("http")&&window.supabase)?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 const $=s=>document.querySelector(s),app=$("#app"),inr=n=>"₹"+Number(n).toLocaleString("en-IN");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let products=[],settings={},orders=[],tab="products",form=null;
+let products=[],settings={},orders=[],reviews=[],tab="products",form=null;
 function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)}
 
 /* ---- login ---- */
@@ -73,43 +74,66 @@ const logout=async()=>{await sb.auth.signOut();showLogin()};
 
 /* ---- data ---- */
 async function loadAll(){
-  const [p,s,o]=await Promise.all([sb.from("products").select("*").order("sort"),sb.from("settings").select("*").eq("id",1).maybeSingle(),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(40)]);
-  products=p.data||[];settings=s.data||{id:1};orders=o.data||[];
+  const [p,s,o,rv]=await Promise.all([sb.from("products").select("*").order("sort"),sb.from("settings").select("*").eq("id",1).maybeSingle(),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(40),sb.from("reviews").select("*").order("created_at",{ascending:false}).limit(300)]);
+  products=p.data||[];settings=s.data||{id:1};orders=o.data||[];reviews=rv.data||[];
 }
 
 /* ---- main screen ---- */
 function render(){
-  const v=tab==="products"?productsView():tab==="orders"?ordersView():settingsView();
+  const v=tab==="products"?productsView():tab==="reviews"?reviewsView():tab==="orders"?ordersView():settingsView();const pend=reviews.filter(r=>!r.approved).length;
   app.innerHTML=`<div class="top"><h1>ZHISBA</h1><div><a class="sm" href="index.html" style="text-decoration:none;margin-right:6px">View shop</a><button class="sm" id="lo">Log out</button></div></div>
-  <div class="seg"><button data-t="products" class="${tab==="products"?"on":""}">Products</button><button data-t="orders" class="${tab==="orders"?"on":""}">Orders</button><button data-t="settings" class="${tab==="settings"?"on":""}">Shop settings</button></div>${v}`;
+  <div class="seg"><button data-t="products" class="${tab==="products"?"on":""}">Products</button><button data-t="reviews" class="${tab==="reviews"?"on":""}">Reviews${pend?` (${pend})`:""}</button><button data-t="orders" class="${tab==="orders"?"on":""}">Orders</button><button data-t="settings" class="${tab==="settings"?"on":""}">Shop settings</button></div>${v}`;
   $("#lo").onclick=logout;
   app.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
   app.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEditor(b.dataset.edit));
   const add=$("#add");if(add)add.onclick=()=>openEditor(null);
-  const ss=$("#ss");if(ss)ss.onclick=saveSettings;
+  const ss=$("#ss");if(ss)ss.onclick=saveSettings;bindReviews();
   app.querySelectorAll("[data-st]").forEach(s=>s.onchange=async()=>{const {error}=await sb.from("orders").update({status:s.value}).eq("id",s.dataset.st);toast(error?"Could not update":"Order updated")});
 }
 function productsView(){
   return`<button class="btn" id="add" style="margin-bottom:14px">+ Add a product</button>`+(products.length?products.map(p=>`<button class="row" data-edit="${esc(p.id)}"><div class="th">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:"📷"}</div><div class="rm"><b>${esc(p.name)}</b><small>${inr(p.price)}${p.compare_price>p.price?` <s>${inr(p.compare_price)}</s>`:""}${p.in_stock===false?" · Sold out":""}${p.active===false?" · Hidden":""}</small></div><span>›</span></button>`).join(""):`<p class="msg">No products yet. Tap “Add a product”.</p>`);
 }
+function reviewsView(){
+  const pn=id=>(products.find(p=>p.id===id)||{}).name||id;
+  const add=`<div class="box" style="margin:0 0 16px"><b>Add a customer review</b><p>Paste a real review a customer sent you on WhatsApp or Instagram.</p>
+   <div class="f"><label>Product</label><select id="rv_p">${products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("")}</select></div>
+   <div class="g2"><div class="f"><label>Customer name</label><input id="rv_n"></div><div class="f"><label>Stars</label><select id="rv_r">${[5,4,3,2,1].map(k=>`<option value="${k}">${"★".repeat(k)}</option>`).join("")}</select></div></div>
+   <div class="f"><label>Review</label><textarea id="rv_c"></textarea></div><button class="btn" id="rv_add">Add review</button></div>`;
+  const list=[...reviews].sort((x,y)=>(x.approved-y.approved)).map(r=>`<div class="ord"><div class="h"><span>${esc(r.name)} · ${"★".repeat(r.rating)}</span><span style="color:${r.approved?"var(--ok)":"var(--rose)"}">${r.approved?"Visible":"Needs approval"}</span></div>
+   <small>${esc(pn(r.product_id))} · ${esc(new Date(r.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}))}</small>${r.comment?`<p style="margin-top:6px">${esc(r.comment)}</p>`:""}
+   <div style="display:flex;gap:8px;margin-top:10px"><button class="sm" data-ra="${esc(r.id)}" data-v="${r.approved?0:1}">${r.approved?"Hide":"Approve"}</button><button class="sm" data-rd="${esc(r.id)}" style="color:var(--err)">Delete</button></div></div>`).join("");
+  return add+(list||`<p class="msg">No reviews yet. New ones from customers will appear here for you to approve.</p>`);
+}
+function bindReviews(){
+  app.querySelectorAll("[data-ra]").forEach(b=>b.onclick=async()=>{const on=b.dataset.v==="1",{error}=await sb.from("reviews").update({approved:on}).eq("id",b.dataset.ra);if(error)return toast("Could not update");reviews.find(x=>x.id===b.dataset.ra).approved=on;render();toast(on?"Review is now live ✓":"Review hidden")});
+  app.querySelectorAll("[data-rd]").forEach(b=>b.onclick=async()=>{if(!confirm("Delete this review for good?"))return;const {error}=await sb.from("reviews").delete().eq("id",b.dataset.rd);if(error)return toast("Could not delete");reviews=reviews.filter(x=>x.id!==b.dataset.rd);render()});
+  const ad=$("#rv_add");if(ad)ad.onclick=async()=>{const row={product_id:$("#rv_p").value,name:$("#rv_n").value.trim(),rating:+$("#rv_r").value,comment:$("#rv_c").value.trim()||null,approved:true};
+    if(row.name.length<2)return toast("Enter the customer's name");
+    const {data,error}=await sb.from("reviews").insert(row).select().single();if(error)return toast("Could not add: "+error.message);reviews.unshift(data);render();toast("Review added ✓")};
+}
 function ordersView(){
   if(!orders.length)return`<p class="msg">No orders yet.</p>`;
   return orders.map(o=>{const same=o.delivery==="same_day";return`<div class="ord"><div class="h"><span>${esc(o.customer_name)}${same?`<span class="tg">Same day ⚡</span>`:""}</span><span>${inr(o.amount)}</span></div>
-  <small>${esc(new Date(o.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}))} · ${o.status==="created"?"Not paid yet":"Paid"}</small>
+  <small>${o.ref?"ZB"+o.ref+" · ":""}${esc(new Date(o.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}))} · ${o.status==="inquiry"?"WhatsApp inquiry, awaiting payment":o.status==="created"?"Online payment not completed":"Paid"}</small>
   <small>${esc((o.items||[]).map(i=>((products.find(p=>p.id===i.id)||{}).name||i.id)+" ×"+i.qty).join(", "))}</small>
-  <small>${esc(o.address)}, ${esc(o.pincode)}</small><small><a href="tel:${esc(o.phone)}">Call ${esc(o.phone)}</a> · <a href="https://wa.me/91${esc(o.phone)}" target="_blank" rel="noopener">WhatsApp</a></small>
-  <select data-st="${esc(o.id)}">${["created","paid","shipped","delivered"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s[0].toUpperCase()+s.slice(1)}</option>`).join("")}</select></div>`}).join("");
+  <small>${esc(o.address)}, ${esc(o.pincode)}</small><small><a href="tel:${esc(o.phone)}">Call ${esc(o.phone)}</a> · <a href="https://wa.me/91${esc(o.phone)}" target="_blank" rel="noopener">WhatsApp</a>${["inquiry","created"].includes(o.status)?` · <a href="${payLink(o)}" target="_blank" rel="noopener">Ask for payment</a>`:""}</small>
+  <select data-st="${esc(o.id)}">${["inquiry","created","paid","shipped","delivered"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s==="inquiry"?"Inquiry (awaiting payment)":s[0].toUpperCase()+s.slice(1)}</option>`).join("")}</select></div>`}).join("");
+}
+function payLink(o){
+  const upi=(settings.upi_id||"").trim();
+  const t=`Hi ${o.customer_name}! 🌷 Thank you for your ZHISBA order${o.ref?" ZB"+o.ref:""}. Your total is ${inr(o.amount)}.`+(upi?` Please pay by UPI to ${upi} and send us the screenshot here.`:` We'll share the payment details here.`);
+  return"https://wa.me/91"+encodeURIComponent(o.phone)+"?text="+encodeURIComponent(t);
 }
 function settingsView(){
   const f=(k,l,t="number",h="")=>`<div class="f"><label>${l}</label><input id="s_${k}" type="${t}" ${t==="number"?'inputmode="numeric"':""} value="${esc(settings[k]??"")}">${h?`<small>${h}</small>`:""}</div>`;
   return`<div class="box" style="margin-top:0"><div class="g2">${f("fee","Delivery charge (₹)")}${f("free_above","Free delivery above (₹)")}</div>
   <div class="g2">${f("sameday_fee","Same-day charge (₹)")}${f("sameday_cutoff","Same-day cutoff hour","number","15 = 3 PM")}</div>
-  ${f("sameday_by","Same-day arrives by","text")}${f("standard_eta","Standard delivery time","text")}${f("whatsapp","WhatsApp number","text","e.g. 919876543210")}${f("instagram","Instagram handle","text")}
+  ${f("sameday_by","Same-day arrives by","text")}${f("standard_eta","Standard delivery time","text")}${f("whatsapp","WhatsApp number","text","e.g. 919876543210")}${f("upi_id","Your UPI ID","text","shown when you ask a customer to pay, e.g. name@okaxis")}${f("instagram","Instagram handle","text")}
   <button class="btn" id="ss">Save settings</button></div>`;
 }
 async function saveSettings(){
   const n=k=>{const v=$("#s_"+k).value.trim();return v===""?null:Number(v)},t=k=>$("#s_"+k).value.trim();
-  const row={id:1,fee:n("fee"),free_above:n("free_above"),sameday_fee:n("sameday_fee"),sameday_cutoff:n("sameday_cutoff"),sameday_by:t("sameday_by"),standard_eta:t("standard_eta"),whatsapp:t("whatsapp"),instagram:t("instagram")};
+  const row={id:1,fee:n("fee"),free_above:n("free_above"),sameday_fee:n("sameday_fee"),sameday_cutoff:n("sameday_cutoff"),sameday_by:t("sameday_by"),standard_eta:t("standard_eta"),whatsapp:t("whatsapp"),upi_id:t("upi_id"),instagram:t("instagram")};
   if([row.fee,row.free_above,row.sameday_fee,row.sameday_cutoff].some(x=>x===null||isNaN(x)||x<0))return toast("Check the number fields");
   const {error}=await sb.from("settings").upsert(row);if(error)return toast("Could not save: "+error.message);settings=row;toast("Settings saved ✓");
 }
@@ -117,11 +141,12 @@ async function saveSettings(){
 /* ---- product editor ---- */
 function openEditor(id){
   const p=id?products.find(x=>x.id===id):null,isNew=!p;
-  form=p?{...p}:{id:"p"+Math.random().toString(36).slice(2,7),name:"",cat:"hijab",price:"",compare_price:"",fabric:"",description:"",in_stock:true,active:true,sort:(products.length?Math.max(...products.map(x=>x.sort||0))+1:1),image_url:""};
-  const ed=$("#ed");
+  form=p?{...p}:{id:"p"+Math.random().toString(36).slice(2,7),name:"",cat:"hijab",price:"",compare_price:"",fabric:"",description:"",in_stock:true,active:true,sort:(products.length?Math.max(...products.map(x=>x.sort||0))+1:1),image_url:"",images:[]};
+  form.images=[...(form.images||[])];const ed=$("#ed");
   ed.innerHTML=`<div><div class="top"><button class="sm" id="cx">Cancel</button><b>${isNew?"New product":"Edit product"}</b><span style="width:70px"></span></div>
   <label class="ph" id="phb">${form.image_url?`<img src="${esc(form.image_url)}" alt="">`:"📷<br>Tap to add a photo"}<input type="file" accept="image/*" id="file" hidden></label>
   <p class="msg" id="pm">Choose from your gallery or take a new photo.</p>
+  <div class="f"><label>More photos <small>(customers swipe through them)</small></label><div class="thumbs" id="th"></div></div>
   <div class="f"><label>Name</label><input id="e_name" value="${esc(form.name)}"></div>
   <div class="g2"><div class="f"><label>Price you sell at (₹)</label><input id="e_price" type="number" inputmode="numeric" value="${esc(form.price)}"></div>
   <div class="f"><label>Old price (₹)</label><input id="e_old" type="number" inputmode="numeric" value="${esc(form.compare_price??"")}"><small>Fill this for a discount</small></div></div>
@@ -133,9 +158,18 @@ function openEditor(id){
   <div class="sw"><span>Visible in shop</span><input type="checkbox" id="e_act" ${form.active!==false?"checked":""}></div>
   <button class="btn" id="sv" style="margin-top:16px">Save product</button>${isNew?"":`<button class="btn del" id="rmv">Delete product</button>`}</div>`;
   requestAnimationFrame(()=>ed.classList.add("open"));ed.scrollTop=0;document.body.style.overflow="hidden";
-  $("#cx").onclick=closeEditor;$("#file").onchange=e=>e.target.files[0]&&upload(e.target.files[0]);$("#sv").onclick=()=>saveProduct(isNew);
+  $("#cx").onclick=closeEditor;paintThumbs();$("#file").onchange=e=>e.target.files[0]&&upload(e.target.files[0]);$("#sv").onclick=()=>saveProduct(isNew);
   const r=$("#rmv");if(r)r.onclick=async()=>{if(!confirm("Delete this product for good? To just hide it, switch off “Visible in shop” instead."))return;
     const {error}=await sb.from("products").delete().eq("id",form.id);if(error)return toast("Could not delete");products=products.filter(x=>x.id!==form.id);closeEditor();render();toast("Deleted")};
+}
+function paintThumbs(){
+  const t=$("#th");if(!t)return;
+  t.innerHTML=form.images.map((u,i)=>`<div class="tb"><img src="${esc(u)}" alt=""><button type="button" data-rm="${i}" aria-label="Remove">✕</button></div>`).join("")+(form.images.length<4?`<label class="tb ad">+<input type="file" accept="image/*" hidden id="xfile"></label>`:"");
+  t.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{form.images.splice(+b.dataset.rm,1);paintThumbs()});
+  const x=$("#xfile");if(x)x.onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=$("#pm");m.className="msg";m.textContent="Uploading photo…";
+    try{const blob=await toJpeg(f),path=`${form.id}-x${Date.now()}.jpg`;const {error}=await sb.storage.from("product-images").upload(path,blob,{contentType:"image/jpeg",upsert:true});if(error)throw error;
+      form.images.push(sb.storage.from("product-images").getPublicUrl(path).data.publicUrl);paintThumbs();m.textContent="Photo added. Tap Save product to keep it.";m.className="msg o"}
+    catch(err){m.textContent="Upload failed: "+(err.message||"try again");m.className="msg e"}};
 }
 function closeEditor(){const ed=$("#ed");ed.classList.remove("open");document.body.style.overflow="";form=null}
 async function toJpeg(file){
@@ -159,7 +193,7 @@ async function saveProduct(isNew){
   if(name.length<2)return toast("Enter a product name");
   if(!(price>0))return toast("Enter a price above 0");
   if(old!==null&&old<=price)return toast("Old price must be higher than the selling price");
-  const row={name,cat:$("#e_cat").value,price,compare_price:old,fabric:$("#e_fab").value.trim(),description:$("#e_desc").value.trim(),sort:Number($("#e_sort").value)||100,in_stock:$("#e_stock").checked,active:$("#e_act").checked,image_url:form.image_url||null};
+  const row={name,cat:$("#e_cat").value,price,compare_price:old,fabric:$("#e_fab").value.trim(),description:$("#e_desc").value.trim(),sort:Number($("#e_sort").value)||100,in_stock:$("#e_stock").checked,active:$("#e_act").checked,image_url:form.image_url||null,images:form.images||[]};
   const btn=$("#sv");btn.disabled=true;btn.textContent="Saving…";
   const {error}=isNew?await sb.from("products").insert({id:form.id,...row}):await sb.from("products").update(row).eq("id",form.id);
   btn.disabled=false;btn.textContent="Save product";
