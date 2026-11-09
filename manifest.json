@@ -1,0 +1,15 @@
+{
+  "name": "ZHISBA - Luxury Hijabs",
+  "short_name": "ZHISBA",
+  "description": "Alluring in modesty. Luxury hijabs at honest prices. Delivering across Bangalore.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf6f2",
+  "theme_color": "#f3dce3",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

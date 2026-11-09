@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZHISBA — Luxury Hijabs</title>
+<meta name="description" content="Alluring in modesty. Luxury hijabs at honest prices. Delivering across Bangalore.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ZHISBA">
+<meta name="theme-color" content="#faf6f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171114" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+<style>
+:root{--bg:#faf6f2;--card:#fff;--ink:#2a2024;--muted:#8a7a80;--rose:#b8536b;--pink:#f3dce3;--line:rgba(42,32,36,.09);--glass:rgba(250,246,242,.78);--err:#c0392b;--ok:#2d8a52;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#171114;--card:#231a1e;--ink:#f6eef1;--muted:#a8959c;--rose:#e58aa2;--pink:#3a2530;--line:rgba(255,255,255,.1);--glass:rgba(23,17,20,.78);--err:#ff7b6b;--ok:#5fd08a}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:120px}
+body.lock{overflow:hidden}
+h1,h2,h3,.serif{font-family:"Playfair Display",Georgia,serif;font-weight:600}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+.press{transition:transform .45s cubic-bezier(.34,1.56,.64,1)}.press:active{transform:scale(.93);transition-duration:.08s}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px}
+
+/* top bar */
+#top{position:fixed;top:0;left:0;right:0;z-index:40;padding-top:env(safe-area-inset-top);text-align:center;transition:background .25s,box-shadow .25s}
+#top.s{background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.8);backdrop-filter:blur(22px) saturate(1.8);box-shadow:0 .5px 0 var(--line)}
+#top b{display:block;padding:13px 0 11px;font:700 20px "Playfair Display",serif;letter-spacing:4px;color:var(--rose);opacity:0;transition:opacity .25s}
+#top.s b{opacity:1}
+
+/* hero */
+.hero{padding:calc(env(safe-area-inset-top) + 56px) 0 28px}
+.hero h1{font-size:clamp(44px,12vw,84px);line-height:1;letter-spacing:-1.5px;margin-bottom:16px}
+.hero p{color:var(--muted);font-size:17px;max-width:30ch;margin-bottom:24px}
+.brandmark{font:700 15px "Playfair Display",serif;letter-spacing:5px;color:var(--rose);margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--rose);color:#fff;padding:15px 28px;border-radius:30px;font-weight:600;font-size:16px}
+.btn.alt{background:var(--pink);color:var(--rose)}.btn.block{width:100%}.btn:disabled{opacity:.6}
+.drape{position:relative;height:340px;border-radius:34px;overflow:hidden;margin-top:34px;background:linear-gradient(160deg,#f3dce3,#e8b4c2);animation:rise 1.1s cubic-bezier(.2,.8,.2,1) backwards}
+.drape i{position:absolute;border-radius:50%;filter:blur(1px);will-change:transform}
+.drape i:nth-child(1){width:420px;height:300px;left:-90px;top:-70px;background:radial-gradient(closest-side,#fff8,#fff0),linear-gradient(135deg,#f9e6ec,#e8b4c2);transform:rotate(-18deg)}
+.drape i:nth-child(2){width:380px;height:260px;right:-120px;top:70px;background:linear-gradient(200deg,#d98aa1,#b8536b);transform:rotate(24deg);opacity:.92}
+.drape i:nth-child(3){width:300px;height:200px;left:10%;bottom:-90px;background:linear-gradient(20deg,#c9a0a8,#f6e3e8);transform:rotate(-8deg);opacity:.95}
+.drape::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 18px,rgba(255,255,255,.14) 18px 20px)}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+@media(min-width:760px){.hero .wrap{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}.drape{margin:0;height:440px}}
+
+/* sections */
+section{padding:30px 0}
+h2.t{font-size:30px;letter-spacing:-.5px}
+.sub{color:var(--muted);font-size:14px;margin:2px 0 16px}
+.chips,.snap{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 18px;margin:0 -18px}
+.chips::-webkit-scrollbar,.snap::-webkit-scrollbar{display:none}
+.chip{scroll-snap-align:start;flex:none;padding:9px 18px;border-radius:20px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:500}
+.chip.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+@media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr);gap:18px}}
+.card{background:var(--card);border-radius:24px;overflow:hidden;position:relative;box-shadow:0 1px 0 var(--line)}
+.art{aspect-ratio:4/5;position:relative;overflow:hidden;background:linear-gradient(160deg,var(--c1),var(--c2))}
+.art::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 15% 8%,rgba(255,255,255,.6),transparent 55%),radial-gradient(90% 70% at 85% 95%,rgba(0,0,0,.16),transparent 60%)}
+.art::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(112deg,transparent 0 14px,rgba(255,255,255,.12) 14px 16px)}
+.art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.heart{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:grid;place-items:center}
+.heart svg{width:18px;height:18px}.heart.on svg{fill:var(--rose);stroke:var(--rose)}
+.info{padding:12px 14px 14px}.info h3{font:600 14.5px/1.3 -apple-system,BlinkMacSystemFont,sans-serif}
+.info small{color:var(--muted);font-size:12px}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.price{font-weight:700;color:var(--rose)}
+.add{width:34px;height:34px;border-radius:50%;background:var(--rose);color:#fff;font-size:22px;line-height:1;display:grid;place-items:center}
+.vals .snap{margin-top:6px}.val{scroll-snap-align:start;flex:none;width:230px;padding:20px;border-radius:24px;background:var(--card)}
+.val b{display:block;font:600 18px "Playfair Display",serif;margin-bottom:6px}.val span{color:var(--muted);font-size:14px}
+.visit{background:var(--pink);border-radius:30px;padding:28px 22px;margin:10px 0}
+.visit p{color:var(--muted);margin:6px 0 18px;font-size:15px}.visit .btns{display:flex;gap:10px;flex-wrap:wrap}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:26px 20px}
+
+/* tab bar */
+#tabs{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:440px;margin:0 auto;height:64px;border-radius:32px;display:flex;justify-content:space-around;align-items:center;z-index:50;background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(1.8);backdrop-filter:blur(26px) saturate(1.8);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--muted);position:relative;padding:6px 0;font-weight:500}
+#tabs button.on{color:var(--rose)}
+#tabs svg,.ic{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bdg{position:absolute;top:0;left:calc(50% + 4px);min-width:17px;height:17px;border-radius:9px;background:var(--rose);color:#fff;font-size:10px;display:grid;place-items:center;padding:0 4px}
+
+/* sheet */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .35s;z-index:90}
+#sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;max-height:93dvh;background:var(--bg);border-radius:28px 28px 0 0;z-index:91;transform:translateY(105%);transition:transform .45s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+body.so #scrim{opacity:1;pointer-events:auto}body.so #sheet{transform:none}
+#sh{padding:8px 20px 6px;touch-action:none;text-align:center}
+#grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px;background:var(--muted);opacity:.4}
+#sh h3{font-size:20px}
+#sx{position:absolute;top:14px;right:16px;width:30px;height:30px;border-radius:50%;background:var(--pink);color:var(--rose);font-size:18px}
+#sb{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 20px 24px}
+.item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.item .art{width:62px;aspect-ratio:1;border-radius:14px;flex:none}
+.item .m{flex:1;font-size:14px;font-weight:500}.item .m small{display:block;color:var(--muted);font-weight:400}
+.qty{display:flex;align-items:center;gap:10px;background:var(--pink);border-radius:18px;padding:3px}
+.qty button{width:28px;height:28px;border-radius:50%;background:var(--card);font-size:16px}
+.sum{margin:16px 0;font-size:14.5px}.sum div{display:flex;justify-content:space-between;padding:4px 0;color:var(--muted)}.sum .tot{color:var(--ink);font-weight:700;font-size:17px;border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+.hint{background:var(--pink);color:var(--rose);border-radius:14px;padding:10px 14px;font-size:13px;margin:12px 0}
+.empty{text-align:center;color:var(--muted);padding:44px 10px}.empty b{display:block;font:600 20px "Playfair Display",serif;color:var(--ink);margin-bottom:4px}
+.f{margin-bottom:12px}.f label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 5px 4px}
+.f input,.f textarea{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:16px;resize:none}
+.f input:focus,.f textarea:focus{outline:2px solid var(--rose);border-color:transparent}
+.msg{font-size:13px;text-align:center;margin:10px 0;min-height:18px}.msg.e{color:var(--err)}.msg.o{color:var(--ok)}
+.seg{display:flex;background:var(--pink);border-radius:14px;padding:3px;margin-bottom:16px}.seg button{flex:1;padding:9px;border-radius:11px;font-weight:600;font-size:14px;color:var(--rose)}.seg button.on{background:var(--card)}
+.det .art{aspect-ratio:1;border-radius:24px;margin-bottom:16px}.det h2{font-size:26px;margin-bottom:4px}.det p{color:var(--muted);margin:10px 0 14px}
+.det ul{list-style:none;margin-bottom:20px}.det li{padding:10px 0;border-top:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between}.det li span{color:var(--muted)}
+.ord{padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between}.ord small{color:var(--muted);display:block}
+.done{text-align:center;padding:30px 6px}.done .ck{width:76px;height:76px;border-radius:50%;background:var(--ok);color:#fff;font-size:38px;display:grid;place-items:center;margin:0 auto 16px;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:24px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s,transform .55s cubic-bezier(.34,1.56,.64,1);z-index:100;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* motion v3 */
+.add,.btn{position:relative}
+.add.ok,.btn.ok{background:var(--ok)!important;color:#fff!important;animation:okp .55s cubic-bezier(.34,1.56,.64,1)}
+.btn.ok{animation-name:okb}
+@keyframes okp{0%{transform:scale(.8)}55%{transform:scale(1.22)}}@keyframes okb{0%{transform:scale(.96)}55%{transform:scale(1.03)}}
+.rip{position:absolute;inset:0;border-radius:inherit;border:2px solid var(--ok);pointer-events:none}
+.tag{position:absolute;top:10px;left:10px;z-index:2;background:var(--rose);color:#fff;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:12px}.tag.so{background:var(--ink);color:var(--bg)}
+.was{color:var(--muted);font-weight:400;font-size:12.5px;margin-left:6px}
+.sk{aspect-ratio:4/5.7;border-radius:24px;background:linear-gradient(100deg,var(--card) 30%,var(--pink) 50%,var(--card) 70%);background-size:200% 100%;animation:sh 1.3s linear infinite}@keyframes sh{to{background-position:-200% 0}}
+.art img{opacity:0;transition:opacity .7s ease}.art img.l{opacity:1}
+.card{will-change:transform}
+#pd{position:fixed;inset:0;z-index:45;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:200px}
+#pd[hidden]{display:none}
+#pd .art{aspect-ratio:1;max-height:64vh;width:100%;border-radius:0 0 34px 34px}
+.pdx{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:16px;z-index:3;width:42px;height:42px;border-radius:50%;background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);display:grid;place-items:center;font-size:28px;line-height:1;padding-bottom:3px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.pdc{padding:22px 22px 0;max-width:620px;margin:0 auto}.pdc h2{font-size:30px;line-height:1.15}
+.prices{display:flex;align-items:center;gap:10px;margin:10px 0 4px}.prices .price{font-size:26px}.prices .was{font-size:16px;margin:0}
+.offb{background:var(--rose);color:#fff;border-radius:10px;padding:2px 9px;font-size:12.5px;font-weight:600}
+.pdc p{color:var(--muted);margin:10px 0 16px}.pdc ul{list-style:none}
+.pdc li{padding:12px 0;border-top:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;gap:14px}.pdc li span{color:var(--muted);text-align:right}
+.pdbar{position:sticky;bottom:calc(90px + env(safe-area-inset-bottom));max-width:620px;margin:18px auto 0;padding:0 22px}
+/* motion */
+main{transform-origin:50% 0;transition:transform .5s cubic-bezier(.32,.72,0,1),filter .5s}
+body.so main{transform:scale(.95);filter:brightness(.9)}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-right:.22em}
+.w>span{display:inline-block;animation:wordup .95s cubic-bezier(.2,.9,.2,1) both;animation-delay:calc(.15s + var(--i)*.13s)}
+@keyframes wordup{from{transform:translateY(112%) rotate(5deg)}to{transform:none}}
+.hero .brandmark,.hero p,.hero .btn{animation:fade .8s ease backwards}
+.hero p{animation-delay:.6s}.hero .btn{animation-delay:.75s}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}}
+.drape i{animation:drift 9s ease-in-out infinite alternate}
+.drape i:nth-child(2){animation-duration:11s;animation-delay:-3s}.drape i:nth-child(3){animation-duration:13s;animation-delay:-6s}
+@keyframes drift{to{translate:26px -18px;rotate:7deg}}
+.rv{opacity:0;transform:translateY(32px) scale(.94)}
+.rv.v{opacity:1;transform:none;transition:opacity .6s ease,transform .85s cubic-bezier(.2,.9,.25,1.12);transition-delay:calc(var(--i,0)*80ms)}
+.bump{animation:bump .55s cubic-bezier(.34,1.56,.64,1)}@keyframes bump{40%{transform:scale(1.7)}}
+.heart.pop svg{animation:hp .6s cubic-bezier(.34,1.56,.64,1)}@keyframes hp{0%{transform:scale(.3)}60%{transform:scale(1.5)}}
+.tabi{animation:tb .5s cubic-bezier(.34,1.56,.64,1)}@keyframes tb{40%{transform:translateY(-7px) scale(1.2)}}
+#sb.in>*,#sb.in .det>*{animation:up .6s cubic-bezier(.2,.9,.2,1) backwards}
+#sb.in>:nth-child(2),#sb.in .det>:nth-child(2){animation-delay:.06s}#sb.in>:nth-child(3),#sb.in .det>:nth-child(3){animation-delay:.12s}
+#sb.in>:nth-child(4),#sb.in .det>:nth-child(4){animation-delay:.18s}#sb.in>:nth-child(5),#sb.in .det>:nth-child(5){animation-delay:.24s}
+#sb.in>:nth-child(n+6),#sb.in .det>:nth-child(n+6){animation-delay:.3s}
+@keyframes up{from{opacity:0;transform:translateY(20px)}}
+.bar{height:6px;border-radius:3px;background:var(--card);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--rose);border-radius:3px;transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.swr{position:relative;overflow:hidden;border-bottom:1px solid var(--line);transition:height .35s ease,opacity .3s}
+.swr .rm{position:absolute;inset:0;background:var(--err);color:#fff;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;font-weight:600;font-size:14px}
+.swr .item{position:relative;background:var(--bg);border:0;touch-action:pan-y}
+.dl{display:flex;gap:10px;margin:14px 0}
+.dl button{flex:1;text-align:left;padding:12px 14px;border-radius:18px;background:var(--card);border:1.5px solid var(--line);transition:border-color .25s,background .25s,transform .45s cubic-bezier(.34,1.56,.64,1)}
+.dl button b{display:block;font-size:14px}.dl button small{color:var(--muted);font-size:12px}
+.dl button.on{border-color:var(--rose);background:var(--pink)}.dl button:disabled{opacity:.5}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="top"><b>ZHISBA</b></div>
+
+<main id="home">
+  <div class="hero"><div class="wrap">
+    <div id="herotxt">
+      <div class="brandmark">ZHISBA</div>
+      <h1 class="serif"><span class="w" style="--i:0"><span>Alluring</span></span><span class="w" style="--i:1"><span>in</span></span><span class="w" style="--i:2"><span>modesty.</span></span></h1>
+      <p>Luxury hijabs at honest prices, delivered across Bangalore.</p>
+      <a class="btn press" href="#shop">Shop the collection</a>
+    </div>
+    <div class="drape" id="drape" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div></div>
+
+  <section id="shop"><div class="wrap">
+    <h2 class="t">The collection</h2>
+    <div class="sub" id="count"></div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </div></section>
+
+  <section class="vals"><div class="wrap">
+    <h2 class="t">Why ZHISBA</h2>
+    <div class="snap">
+      <div class="val"><b>Premium fabrics</b><span>Soft, breathable and made to drape well all day.</span></div>
+      <div class="val"><b>Honest prices</b><span>Luxury feel without the luxury markup.</span></div>
+      <div class="val"><b>Gift-ready hampers</b><span>Curated sets that arrive beautifully packed.</span></div>
+      <div class="val"><b>Bangalore delivery</b><span>Fast local delivery, tracked on WhatsApp.</span></div>
+    </div>
+  </div></section>
+
+  <section id="visit"><div class="wrap"><div class="visit">
+    <h2 class="t">Need help choosing?</h2>
+    <p>Message us and we'll help you pick the right colour and fabric. Delivery is free above <span class="fd"></span>.</p>
+    <div class="btns"><a class="btn press" id="wa" target="_blank" rel="noopener">Chat on WhatsApp</a><a class="btn alt press" id="ig" target="_blank" rel="noopener">Instagram</a></div>
+  </div></div></section>
+  <footer><div class="serif" style="font-size:18px;color:var(--rose)">ZHISBA.</div>Luxury hijabs at honest prices · Delivering across Bangalore</footer>
+</main>
+
+<div id="pd" hidden></div>
+<nav id="tabs" aria-label="Main"></nav>
+<div id="scrim"></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="st">
+  <div id="sh"><div id="grab"></div><h3 id="st"></h3><button id="sx" aria-label="Close">✕</button></div>
+  <div id="sb"></div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== SETTINGS: edit these ===== */
+const CONFIG={
+  SUPABASE_URL:"YOUR_SUPABASE_URL",          // https://xxxx.supabase.co
+  SUPABASE_ANON_KEY:"YOUR_SUPABASE_ANON_KEY",
+  RAZORPAY_KEY_ID:"YOUR_RAZORPAY_KEY_ID",    // only used if Supabase isn't set up (test mode)
+  WHATSAPP:"91XXXXXXXXXX",                   // country code + number, no + or spaces
+  INSTAGRAM:"zhisba",
+  FREE_ABOVE:999, FEE:49,                    // keep these 4 numbers in sync with supabase/functions/razorpay/index.ts
+  SAMEDAY_FEE:99, SAMEDAY_CUTOFF:15,         // same-day: flat fee, order before 3 PM (24h clock)
+  SAMEDAY_BY:"9 PM", STANDARD_ETA:"1–2 days"  // text shown to customers
+};
+/* Fallback products, used only if Supabase is not connected. Once Supabase is connected, manage products in its Table Editor. */
+const FALLBACK=[
+ {id:"p1",name:"Chiffon Hijab — Blush Pink",cat:"hijab",price:399,c1:"#f9dfe7",c2:"#e8a9bb",fabric:"Chiffon",desc:"A light, flowing chiffon hijab in a soft blush that goes with everything."},
+ {id:"p2",name:"Premium Jersey Hijab — Taupe",cat:"hijab",price:449,c1:"#cdb6aa",c2:"#8f7468",fabric:"Jersey",desc:"Stretchy, comfortable jersey that stays in place through the day."},
+ {id:"p3",name:"Gift Hamper — Hijab + Pin Set",cat:"hamper",price:699,c1:"#f3c6d3",c2:"#b8536b",fabric:"Hamper",desc:"A hijab and matching pins, packed and ready to gift."},
+ {id:"p4",name:"Chiffon Hijab — Dusty Rose",cat:"hijab",price:399,c1:"#e5a7b5",c2:"#b4677c",fabric:"Chiffon",desc:"A deeper rose in the same airy chiffon our customers love."},
+ {id:"p5",name:"Essentials Hamper",cat:"hamper",price:899,c1:"#e9d8dd",c2:"#c58a9b",fabric:"Hamper",desc:"Everything you need to start or refresh your hijab wardrobe."},
+ {id:"p6",name:"Everyday Jersey Hijab — Cream",cat:"hijab",price:429,c1:"#f7efe4",c2:"#d8c3a8",fabric:"Jersey",desc:"A neutral cream jersey for easy everyday wear."}
+];
+/* ================================= */
+let PRODUCTS=FALLBACK;
+const $=s=>document.querySelector(s), inr=n=>"₹"+n.toLocaleString("en-IN");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(8)}catch{}};
+const P=id=>PRODUCTS.find(p=>p.id===id);
+const ICON={home:"M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",shop:"M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",heart:"M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z",bag:"M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",user:"M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"};
+const ic=n=>`<svg class="ic" viewBox="0 0 24 24"><path d="${ICON[n]}"/></svg>`;
+
+let bag=ls.get("zb_bag",{}), saved=ls.get("zb_saved",[]), filter="all", user=null, session=null, view=null, delivery="standard";
+const saveState=()=>{ls.set("zb_bag",bag);ls.set("zb_saved",saved);paintBadges()};
+
+const sb=(CONFIG.SUPABASE_URL.startsWith("http"))?(()=>{try{return window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY)}catch{return null}})():null;
+const FN=CONFIG.SUPABASE_URL+"/functions/v1/razorpay";
+const calc=()=>{const sub=Object.entries(bag).reduce((s,[id,q])=>s+(P(id)?P(id).price*q:0),0);const fee=sub===0?0:delivery==="same"?CONFIG.SAMEDAY_FEE:sub>=CONFIG.FREE_ABOVE?0:CONFIG.FEE;return{sub,fee,total:sub+fee}};
+const count=()=>Object.values(bag).reduce((a,b)=>a+b,0);
+
+/* ---------- storefront ---------- */
+const art=(p,extra="")=>`<div class="art ${extra}" style="--c1:${esc(p.c1)};--c2:${esc(p.c2)}">${p.img?`<img src="${esc(p.img)}" alt="${esc(p.name)}" loading="lazy" onload="this.classList.add('l')" onerror="this.remove()">`:""}</div>`;
+const off=p=>p.was>p.price?Math.round((1-p.price/p.was)*100):0;
+const priceHTML=p=>`<span class="price">${inr(p.price)}</span>${off(p)?`<s class="was">${inr(p.was)}</s>`:""}`;
+let loading=false;
+function paintGrid(){
+  const list=PRODUCTS.filter(p=>filter==="all"||p.cat===filter);
+  $("#count").textContent=loading?"Loading the collection…":list.length+(list.length===1?" piece":" pieces");
+  $("#chips").innerHTML=[["all","All"],["hijab","Hijabs"],["hamper","Hampers"]].map(([k,l])=>`<button class="chip press ${filter===k?"on":""}" data-a="filter" data-v="${k}">${l}</button>`).join("");
+  $("#grid").innerHTML=loading?'<div class="sk"></div>'.repeat(4):!list.length?`<div class="empty" style="grid-column:1/-1"><b>Nothing here yet</b>New pieces are on the way.</div>`:list.map(p=>`<div class="card"><div class="press" data-a="open" data-v="${p.id}" role="button" tabindex="0" aria-label="View ${esc(p.name)}">${art(p)}</div>${p.stock===false?`<span class="tag so">Sold out</span>`:off(p)?`<span class="tag">${off(p)}% off</span>`:""}
+   <button class="heart press ${saved.includes(p.id)?"on":""}" data-a="fav" data-v="${p.id}" aria-label="Save"><svg class="ic" viewBox="0 0 24 24"><path d="${ICON.heart}"/></svg></button>
+   <div class="info"><h3>${esc(p.name)}</h3><small>${esc(p.fabric)}</small><div class="row"><div>${priceHTML(p)}</div>${p.stock===false?"":`<button class="add press" data-a="add" data-v="${p.id}" aria-label="Add to bag">+</button>`}</div></div></div>`).join("");
+  reveal(".card");
+}
+let lastN=null;
+function paintBadges(){
+  const n=count(),m=saved.length;
+  const tabs=[["home","Home"],["shop","Shop"],["heart","Saved",m],["bag","Bag",n],["user","Account"]];
+  $("#tabs").innerHTML=tabs.map(([i,l,b])=>`<button class="press" data-a="tab" data-v="${i}" aria-label="${l}">${ic(i)}${l}${b?`<span class="bdg">${b}</span>`:""}</button>`).join("");
+  if(lastN!==null&&n>lastN){const g=$('#tabs [data-v="bag"] .bdg');g&&g.classList.add("bump")}
+  lastN=n;
+}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2000)}
+
+/* ---------- sheet ---------- */
+function openSheet(title,fn,mount){view={fn,mount};$("#st").textContent=title;paintSheet(true);document.body.classList.add("so","lock");$("#sb").scrollTop=0}
+function paintSheet(first){const b=$("#sb");b.classList.toggle("in",first===true);b.innerHTML=view.fn();view.mount&&view.mount();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>b.querySelectorAll(".bar i").forEach(i=>i.style.width=i.dataset.w+"%")))}
+function closeSheet(){document.body.classList.remove("so");if($("#pd").hidden)document.body.classList.remove("lock");view=null}
+$("#scrim").onclick=closeSheet;$("#sx").onclick=closeSheet;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#pd").hidden?closeSheet():closeProduct()}});
+(function(){let y0=0,dy=0,on=false;const s=$("#sheet"),h=$("#sh");
+ h.addEventListener("touchstart",e=>{y0=e.touches[0].clientY;on=true;s.style.transition="none"},{passive:true});
+ h.addEventListener("touchmove",e=>{if(!on)return;dy=Math.max(0,e.touches[0].clientY-y0);s.style.transform=`translateY(${dy}px)`},{passive:true});
+ h.addEventListener("touchend",()=>{on=false;s.style.transition="";s.style.transform="";if(dy>110)closeSheet();dy=0});
+})();
+
+/* ---------- views ---------- */
+function pdHTML(p){const o=off(p),out=p.stock===false;
+  return`<button class="pdx press" data-a="pdclose" aria-label="Back">‹</button><div style="position:relative">${art(p)}${out?`<span class="tag so">Sold out</span>`:o?`<span class="tag">${o}% off</span>`:""}</div>
+  <div class="pdc"><h2>${esc(p.name)}</h2><div class="prices"><span class="price">${inr(p.price)}</span>${o?`<s class="was">${inr(p.was)}</s><span class="offb">Save ${inr(p.was-p.price)}</span>`:""}</div>
+  <p>${esc(p.desc)}</p><ul>${p.fabric?`<li>Fabric<span>${esc(p.fabric)}</span></li>`:""}<li>Delivery<span>Bangalore · free above ${inr(CONFIG.FREE_ABOVE)}</span></li><li>Same-day<span>${inr(CONFIG.SAMEDAY_FEE)} · order before ${CONFIG.SAMEDAY_CUTOFF%12||12} ${CONFIG.SAMEDAY_CUTOFF<12?"AM":"PM"}</span></li></ul></div>
+  <div class="pdbar">${out?`<button class="btn block" disabled>Sold out</button>`:`<button class="btn block press" data-a="add" data-v="${p.id}">Add to bag</button>`}</div>`}
+function bagView(){
+  const ids=Object.keys(bag).filter(P);
+  if(!ids.length)return`<div class="empty"><b>Your bag is empty</b>Pick something you love from the collection.<br><br><button class="btn press" data-a="shop">Browse the collection</button></div>`;
+  const open=sameDayOpen();if(delivery==="same"&&!open)delivery="standard";
+  const {sub,fee,total}=calc(),left=CONFIG.FREE_ABOVE-sub;
+  const cut=(CONFIG.SAMEDAY_CUTOFF%12||12)+(CONFIG.SAMEDAY_CUTOFF<12?" AM":" PM");
+  return ids.map(id=>{const p=P(id);return`<div class="swr" data-id="${id}"><div class="rm">Remove</div><div class="item">${art(p)}<div class="m">${esc(p.name)}<small>${inr(p.price*bag[id])}</small></div><div class="qty"><button data-a="qty" data-v="${id}" data-d="-1" aria-label="Less">−</button><span>${bag[id]}</span><button data-a="qty" data-v="${id}" data-d="1" aria-label="More">+</button></div></div></div>`}).join("")
+  +`<div class="dl"><button class="press ${delivery==="standard"?"on":""}" data-a="dlv" data-v="standard"><b>Standard</b><small>${CONFIG.STANDARD_ETA}</small></button><button class="press ${delivery==="same"?"on":""}" data-a="dlv" data-v="same" ${open?"":"disabled"}><b>Same day ⚡</b><small>${open?"Today by "+CONFIG.SAMEDAY_BY+" · "+inr(CONFIG.SAMEDAY_FEE):"Order before "+cut}</small></button></div>`
+  +(delivery==="standard"?`<div class="hint">${left>0?"Add "+inr(left)+" more for free delivery":"You've unlocked free delivery 🌷"}<div class="bar"><i data-w="${Math.min(100,sub/CONFIG.FREE_ABOVE*100)}" style="width:0"></i></div></div>`:"")
+  +`<div class="sum"><div><span>Subtotal</span><span>${inr(sub)}</span></div><div><span>${delivery==="same"?"Same-day delivery":"Delivery"}</span><span>${fee?inr(fee):"Free"}</span></div><div class="tot"><span>Total</span><span>${inr(total)}</span></div></div>
+   <button class="btn block press" data-a="checkout">Continue to delivery</button>`;
+}
+const cust=ls.get("zb_cust",{});
+function checkoutView(){return`<form id="cf" novalidate>
+ <div class="f"><label>Full name</label><input name="name" autocomplete="name" value="${esc(cust.name)}"></div>
+ <div class="f"><label>Phone (WhatsApp)</label><input name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" value="${esc(cust.phone)}"></div>
+ <div class="f"><label>Delivery address</label><textarea name="address" rows="3" autocomplete="street-address">${esc(cust.address)}</textarea></div>
+ <div class="f"><label>Pincode (Bangalore)</label><input name="pincode" inputmode="numeric" autocomplete="postal-code" maxlength="6" value="${esc(cust.pincode)}"></div>
+ <div class="msg" id="cm"></div>
+ <button class="btn block press" id="pay" type="submit">Pay ${inr(calc().total)}</button>
+ <button class="btn alt block press" id="waord" type="button" style="margin-top:10px">Order on WhatsApp instead</button></form>`}
+function readForm(){
+  const f=new FormData($("#cf")),c={};["name","phone","address","pincode"].forEach(k=>c[k]=String(f.get(k)||"").trim());
+  let e="";
+  if(c.name.length<2)e="Enter your full name.";
+  else if(!/^[6-9]\d{9}$/.test(c.phone))e="Enter a valid 10-digit mobile number.";
+  else if(c.address.length<8)e="Enter your full address with area and landmark.";
+  else if(!/^560\d{3}$/.test(c.pincode))e="We deliver in Bangalore only. Enter a pincode starting with 560.";
+  const m=$("#cm");m.textContent=e;m.className="msg"+(e?" e":"");
+  if(!e){ls.set("zb_cust",c);Object.assign(cust,c)}
+  return e?null:c;
+}
+function checkoutMount(){
+  $("#cf").onsubmit=e=>{e.preventDefault();const c=readForm();if(c)pay(c)};
+  $("#waord").onclick=()=>{const c=readForm();if(!c)return;
+    const lines=Object.entries(bag).map(([id,q])=>`• ${P(id).name} × ${q} — ${inr(P(id).price*q)}`).join("\n");
+    const t=`Hi ZHISBA! I'd like to order:\n${lines}\n${delivery==="same"?"Same-day delivery":"Standard delivery"}\nTotal: ${inr(calc().total)}\n\nName: ${c.name}\nPhone: ${c.phone}\nAddress: ${c.address}, ${c.pincode}`;
+    window.open("https://wa.me/"+CONFIG.WHATSAPP+"?text="+encodeURIComponent(t),"_blank")};
+}
+function doneView(phone,same){return`<div class="done"><div class="ck">✓</div><h2 class="serif" style="font-size:26px">Order placed</h2><p style="color:var(--muted);margin:8px 0 22px">${same?"Your order arrives today by "+CONFIG.SAMEDAY_BY+". ":""}Thank you! We'll message you on ${esc(phone)} with delivery updates.</p><button class="btn press" data-a="close">Keep shopping</button></div>`}
+
+/* ---------- payment ---------- */
+async function pay(c){
+  const btn=$("#pay"),m=$("#cm");btn.disabled=true;btn.textContent="Please wait…";
+  const reset=()=>{btn.disabled=false;btn.textContent="Pay "+inr(calc().total)};
+  const fail=t=>{m.textContent=t;m.className="msg e";reset()};
+  const same=delivery==="same";const success=()=>{bag={};delivery="standard";saveState();$("#st").textContent="Done";view={fn:()=>doneView(c.phone,same)};paintSheet(true);buzz();confetti()};
+  if(!window.Razorpay)return fail("Payments are still loading. Check your connection and try again.");
+  const items=Object.entries(bag).map(([id,qty])=>({id,qty}));
+  const opts={name:"ZHISBA",description:"Your order",currency:"INR",prefill:{name:c.name,contact:c.phone,email:user?.email||""},theme:{color:"#b8536b"},modal:{ondismiss:reset}};
+  try{
+    if(sb){ // secure flow: server sets the price and verifies the payment
+      const H={"Content-Type":"application/json",apikey:CONFIG.SUPABASE_ANON_KEY,Authorization:"Bearer "+(session?.access_token||CONFIG.SUPABASE_ANON_KEY)};
+      const r=await fetch(FN+"/create-order",{method:"POST",headers:H,body:JSON.stringify({items,customer:c,delivery:same?"same_day":"standard"})});
+      const o=await r.json();if(!r.ok)throw new Error(o.error||"Could not start payment");
+      Object.assign(opts,{key:o.key,amount:o.amount,order_id:o.order_id,handler:async resp=>{
+        try{const v=await fetch(FN+"/verify",{method:"POST",headers:H,body:JSON.stringify(resp)});if(!v.ok)throw 0;success()}
+        catch{fail("Payment received but we couldn't confirm it. Message us on WhatsApp with your payment ID: "+resp.razorpay_payment_id)}}});
+    }else{ // test mode only: amount is set in the browser, never use for real sales
+      if(!CONFIG.RAZORPAY_KEY_ID.startsWith("rzp_"))return fail("Online payment isn't set up yet. Use “Order on WhatsApp”.");
+      Object.assign(opts,{key:CONFIG.RAZORPAY_KEY_ID,amount:calc().total*100,handler:success});
+    }
+    new Razorpay(opts).open();
+  }catch(e){fail(e.message||"Something went wrong. Please try again.")}
+}
+
+/* ---------- saved & account ---------- */
+function savedView(){
+  if(!saved.length)return`<div class="empty"><b>Nothing saved yet</b>Tap the heart on any piece to keep it here.</div>`;
+  return saved.map(id=>{const p=P(id);return`<div class="item press" data-a="open" data-v="${id}">${art(p)}<div class="m">${esc(p.name)}<small>${inr(p.price)}</small></div><button class="add" data-a="add" data-v="${id}" aria-label="Add to bag">+</button></div>`}).join("");
+}
+let authMode="login";
+function accountView(){
+  if(user)return`<p style="margin-bottom:6px;color:var(--muted)">Signed in as</p><p style="font-weight:600;margin-bottom:20px">${esc(user.email)}</p>
+   <h3 style="font-size:18px;margin-bottom:6px">Your orders</h3><div id="ol"><div class="empty" style="padding:20px">Loading…</div></div>
+   <button class="btn alt block press" data-a="logout" style="margin-top:20px">Log out</button>`;
+  return`<div class="seg"><button class="${authMode==="login"?"on":""}" data-a="mode" data-v="login">Log in</button><button class="${authMode==="signup"?"on":""}" data-a="mode" data-v="signup">Sign up</button></div>
+   <form id="af"><div class="f"><label>Email</label><input name="email" type="email" autocomplete="email" inputmode="email"></div>
+   <div class="f"><label>Password</label><input name="password" type="password" autocomplete="${authMode==="login"?"current-password":"new-password"}"></div>
+   <div class="msg" id="am"></div><button class="btn block press" type="submit">${authMode==="login"?"Log in":"Create account"}</button></form>
+   <p style="color:var(--muted);font-size:12.5px;text-align:center;margin-top:14px">An account is optional. You can check out as a guest.</p>`;
+}
+function accountMount(){
+  if(user){loadOrders();return}
+  const f=$("#af");if(!f)return;
+  f.onsubmit=async e=>{e.preventDefault();const m=$("#am"),d=new FormData(f),email=String(d.get("email")).trim(),password=String(d.get("password"));
+    if(!sb){m.textContent="Accounts aren't set up yet.";m.className="msg e";return}
+    if(!email||password.length<6){m.textContent="Enter your email and a password of 6+ characters.";m.className="msg e";return}
+    m.textContent="Please wait…";m.className="msg";
+    const r=authMode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+    if(r.error){m.textContent=r.error.message;m.className="msg e";return}
+    if(!r.data.session){m.textContent="Check your email to confirm your account, then log in.";m.className="msg o";return}
+    toast("Welcome to ZHISBA");};
+}
+async function loadOrders(){
+  const box=$("#ol");if(!box||!sb)return;
+  const {data,error}=await sb.from("orders").select("created_at,amount,status,items").order("created_at",{ascending:false}).limit(10);
+  if(error||!data||!data.length){box.innerHTML=`<div class="empty" style="padding:20px">No orders yet.</div>`;return}
+  box.innerHTML=data.map(o=>`<div class="ord"><div>${esc(new Date(o.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}))}<small>${esc((o.items||[]).map(i=>(P(i.id)?.name||i.id)+" ×"+i.qty).join(", "))}</small></div><div style="text-align:right">${inr(o.amount)}<small>${esc(o.status)}</small></div></div>`).join("");
+}
+
+/* ---------- actions ---------- */
+const openBag=()=>openSheet("Your bag",bagView);
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-a]");if(!t)return;
+  const a=t.dataset.a,v=t.dataset.v;
+  if(a==="open"&&!e.target.closest(".add"))openProduct(v,t.querySelector(".art"));
+  else if(a==="pdclose")closeProduct();
+  else if(a==="add"){e.stopPropagation();if(!P(v)||P(v).stock===false){toast("Sold out");return}fly(t.closest(".card")?.querySelector(".art")||t.closest(".item")?.querySelector(".art")||$("#pd .art"));bag[v]=(bag[v]||0)+1;saveState();buzz();addFx(t);toast(P(v).name+" added to bag")}
+  else if(a==="fav"){saved=saved.includes(v)?saved.filter(x=>x!==v):[...saved,v];saveState();buzz();const on=saved.includes(v);t.classList.remove("pop");t.classList.toggle("on",on);if(on){void t.offsetWidth;t.classList.add("pop");hearts(t)}}
+  else if(a==="filter"){filter=v;buzz();paintGrid()}
+  else if(a==="dlv"){delivery=v;buzz();paintSheet()}
+  else if(a==="qty"){bag[v]+=+t.dataset.d;if(bag[v]<=0)delete bag[v];saveState();paintSheet()}
+  else if(a==="checkout")openSheet("Delivery details",checkoutView,checkoutMount);
+  else if(a==="close"){closeSheet()}
+  else if(a==="shop"){closeSheet();closeProduct();$("#shop").scrollIntoView()}
+  else if(a==="mode"){authMode=v;paintSheet()}
+  else if(a==="logout"){sb.auth.signOut();closeSheet();toast("Logged out")}
+  else if(a==="tab"){buzz();{const sv=t.querySelector("svg");sv.classList.remove("tabi");void sv.getBoundingClientRect();sv.classList.add("tabi")}
+    if(v==="home"){closeSheet();closeProduct();scrollTo({top:0})}
+    else if(v==="shop"){closeSheet();closeProduct();$("#shop").scrollIntoView()}
+    else if(v==="heart")openSheet("Saved",savedView);
+    else if(v==="bag")openBag();
+    else if(v==="user")openSheet(user?"Account":"Welcome",accountView,accountMount);
+  }
+});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches('[role="button"][data-a]')){e.preventDefault();e.target.click()}});
+
+/* ---------- scroll feel ---------- */
+(function(){let tick=false;const top=$("#top"),dr=$("#drape"),ht=$("#herotxt");
+ addEventListener("scroll",()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{const y=scrollY;top.classList.toggle("s",y>60);
+  if(y<700&&!matchMedia("(prefers-reduced-motion:reduce)").matches){dr.style.transform=`translateY(${y*.08}px)`;ht.style.transform=`translateY(${y*.16}px)`;ht.style.opacity=Math.max(0,1-y/520)};tick=false})},{passive:true});
+})();
+
+/* ---------- motion & touch ---------- */
+const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
+function sameDayOpen(){const h=(+new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata",hour:"numeric",hour12:false}))%24;return h<CONFIG.SAMEDAY_CUTOFF}
+const io="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("v");io.unobserve(e.target)}}),{threshold:.1,rootMargin:"0px 0px -40px 0px"}):null;
+function reveal(sel){document.querySelectorAll(sel).forEach((el,i)=>{el.classList.add("rv");el.style.setProperty("--i",i%6);io?io.observe(el):el.classList.add("v")})}
+function fly(src){ // product image arcs into the Bag tab
+  const dst=$('#tabs [data-v="bag"]');if(RM||!src||!dst)return;
+  const a=src.getBoundingClientRect(),b=dst.getBoundingClientRect(),el=src.cloneNode(true);
+  el.style.cssText=`position:fixed;left:${a.left}px;top:${a.top}px;width:${a.width}px;height:${a.height}px;z-index:120;margin:0;pointer-events:none;border-radius:22px`;
+  document.body.appendChild(el);
+  const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);
+  el.animate([{transform:"none",opacity:1},{transform:`translate(${dx*.45}px,${dy*.25-70}px) scale(.45)`,opacity:1,offset:.5},{transform:`translate(${dx}px,${dy}px) scale(.06)`,opacity:.3}],{duration:800,easing:"cubic-bezier(.5,0,.25,1)"}).onfinish=()=>el.remove();
+}
+function confetti(){
+  if(RM)return;const cols=["#b8536b","#e8b4c2","#f3dce3","#d98aa1","#ffffff","#c9a0a8"];
+  for(let i=0;i<54;i++){const d=document.createElement("i"),w=6+Math.random()*7,a=Math.random()*Math.PI*2,v=110+Math.random()*230;
+   d.style.cssText=`position:fixed;left:50%;top:40%;width:${w}px;height:${w*1.6}px;background:${cols[i%6]};border-radius:2px;z-index:130;pointer-events:none`;document.body.appendChild(d);
+   d.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v-130}px) rotate(${Math.random()*540}deg)`,opacity:1,offset:.42},{transform:`translate(${Math.cos(a)*v*1.25}px,${Math.sin(a)*v+280}px) rotate(${Math.random()*900}deg)`,opacity:0}],{duration:1500+Math.random()*800,easing:"cubic-bezier(.2,.7,.4,1)"}).onfinish=()=>d.remove()}
+}
+(function(){ // swipe a bag item left to remove it, like iOS
+  let el=null,x0=0,y0=0,dx=0,lock=null;const box=$("#sb");
+  box.addEventListener("touchstart",e=>{const r=e.target.closest(".swr");if(!r||e.target.closest(".qty"))return;el=r.querySelector(".item");x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=0;lock=null;el.style.transition="none"},{passive:true});
+  box.addEventListener("touchmove",e=>{if(!el)return;const mx=e.touches[0].clientX-x0,my=e.touches[0].clientY-y0;if(lock===null&&Math.abs(mx)+Math.abs(my)>8)lock=Math.abs(mx)>Math.abs(my);if(!lock)return;dx=Math.min(0,mx);el.style.transform=`translateX(${dx}px)`},{passive:true});
+  box.addEventListener("touchend",()=>{if(!el)return;const row=el.parentElement,id=row.dataset.id;el.style.transition="transform .35s cubic-bezier(.2,.9,.2,1)";
+   if(dx<-110){el.style.transform="translateX(-110%)";buzz();row.style.height=row.offsetHeight+"px";requestAnimationFrame(()=>{row.style.height="0";row.style.opacity="0"});setTimeout(()=>{delete bag[id];saveState();if(view)paintSheet()},350)}else el.style.transform="";el=null});
+})();
+
+/* ---------- product page, add button, touch ---------- */
+const inset=r=>`inset(${r.top}px ${innerWidth-r.right}px ${innerHeight-r.bottom}px ${r.left}px round 26px)`;
+const EASE="cubic-bezier(.32,.72,0,1)";let pdSrc=null;
+function openProduct(id,src){
+  const p=P(id);if(!p)return;const pd=$("#pd");
+  pd.innerHTML=pdHTML(p);pd.scrollTop=0;pd.hidden=false;pd.style.transition="";pd.style.transform="";pdSrc=src;document.body.classList.add("lock");buzz();
+  if(RM||!src)return;
+  const r=src.getBoundingClientRect();pd.style.clipPath=inset(r);
+  pd.animate([{clipPath:inset(r),transform:"scale(.97)"},{clipPath:"inset(0px 0px 0px 0px round 0px)",transform:"none"}],{duration:650,easing:EASE}).onfinish=()=>{pd.style.clipPath=""};
+  pd.querySelector(".art").animate([{transform:"scale(1.4)"},{transform:"none"}],{duration:760,easing:EASE});
+  pd.querySelectorAll(".pdc>*,.pdbar").forEach((el,i)=>el.animate([{opacity:0,transform:"translateY(28px)"},{opacity:1,transform:"none"}],{duration:650,delay:240+i*80,easing:"cubic-bezier(.2,.9,.2,1)",fill:"backwards"}));
+}
+function closeProduct(){
+  const pd=$("#pd");if(pd.hidden)return;
+  const end=()=>{pd.getAnimations().forEach(a=>a.cancel());pd.hidden=true;pd.style.clipPath="";pd.style.transform="";pd.style.transition="";if(!document.body.classList.contains("so"))document.body.classList.remove("lock")};
+  pd.style.transition="none";pd.style.transform="";
+  const r=pdSrc&&pdSrc.isConnected?pdSrc.getBoundingClientRect():null;
+  if(RM||!r||r.bottom<60||r.top>innerHeight-60){pd.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(50px)"}],{duration:280,easing:"ease-in"}).onfinish=end;return}
+  pd.animate([{clipPath:"inset(0px 0px 0px 0px round 0px)",transform:"none"},{clipPath:inset(r),transform:"scale(.97)"}],{duration:520,easing:EASE,fill:"forwards"}).onfinish=end;
+}
+(function(){ // pull the product page down to dismiss
+  const pd=$("#pd");let y0=0,dy=0,on=false;
+  pd.addEventListener("touchstart",e=>{on=pd.scrollTop<=0;y0=e.touches[0].clientY;dy=0},{passive:true});
+  pd.addEventListener("touchmove",e=>{if(!on)return;dy=e.touches[0].clientY-y0;if(dy>0&&pd.scrollTop<=0){pd.style.transition="none";pd.style.transform=`translateY(${dy*.55}px) scale(${1-Math.min(dy,400)/2600})`;pd.style.borderRadius="28px"}else{dy=0;pd.style.transform=""}},{passive:true});
+  pd.addEventListener("touchend",()=>{if(!on)return;on=false;if(dy>130)closeProduct();else if(dy>0){pd.style.transition="transform .5s cubic-bezier(.34,1.56,.64,1)";pd.style.transform="";pd.style.borderRadius=""}dy=0});
+})();
+function addFx(b){ // button turns into a green tick with a ripple and sparkles
+  if(!b.dataset.o)b.dataset.o=b.innerHTML;
+  b.innerHTML=b.classList.contains("btn")?"Added to bag ✓":"✓";b.classList.add("ok");
+  if(!RM){const r=document.createElement("i");r.className="rip";b.appendChild(r);r.animate([{transform:"scale(.6)",opacity:.8},{transform:"scale(2.3)",opacity:0}],{duration:650,easing:"ease-out"}).onfinish=()=>r.remove();sparkle(b)}
+  clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove("ok");b.innerHTML=b.dataset.o;delete b.dataset.o},1400);
+}
+function sparkle(b){
+  const r=b.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<10;i++){const d=document.createElement("i"),a=i/10*Math.PI*2+Math.random()*.4,v=30+Math.random()*28;
+   d.style.cssText=`position:fixed;left:${cx-3}px;top:${cy-3}px;width:6px;height:6px;border-radius:50%;background:${i%2?"var(--rose)":"#f4b6c6"};z-index:125;pointer-events:none`;document.body.appendChild(d);
+   d.animate([{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v}px) scale(0)`,opacity:0}],{duration:560+Math.random()*240,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>d.remove()}
+}
+function hearts(b){
+  if(RM)return;const r=b.getBoundingClientRect();
+  for(let i=0;i<7;i++){const d=document.createElement("i");d.textContent="♥";
+   d.style.cssText=`position:fixed;left:${r.left+r.width/2-6}px;top:${r.top+r.height/2-6}px;color:var(--rose);font-size:${10+Math.random()*9}px;font-style:normal;z-index:125;pointer-events:none`;document.body.appendChild(d);
+   d.animate([{transform:"translate(0,0) scale(.4)",opacity:1},{transform:`translate(${(Math.random()-.5)*70}px,${-45-Math.random()*45}px) scale(1.2)`,opacity:0}],{duration:800+Math.random()*400,easing:"cubic-bezier(.2,.7,.3,1)"}).onfinish=()=>d.remove()}
+}
+(function(){ // cards tilt toward your finger while pressed, then spring back
+  let c=null;
+  const set=e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transition="transform .12s";c.style.transform=`perspective(700px) rotateX(${-y*11}deg) rotateY(${x*13}deg) scale(.965)`};
+  const off=()=>{if(!c)return;c.style.transition="transform .65s cubic-bezier(.34,1.56,.64,1)";c.style.transform="";c=null};
+  document.addEventListener("pointerdown",e=>{const k=e.target.closest(".card");if(!k||e.target.closest("button")||RM)return;c=k;set(e)},{passive:true});
+  document.addEventListener("pointermove",e=>{if(c)set(e)},{passive:true});
+  ["pointerup","pointercancel","pointerleave"].forEach(n=>document.addEventListener(n,off,{passive:true}));
+})();
+
+/* ---------- catalogue from Supabase ---------- */
+function clean(){Object.keys(bag).forEach(k=>{if(!P(k)||!(bag[k]>0))delete bag[k]});saved=saved.filter(P);saveState()}
+function applyCfg(){$(".fd").textContent=inr(CONFIG.FREE_ABOVE);$("#wa").href="https://wa.me/"+CONFIG.WHATSAPP;$("#ig").href="https://instagram.com/"+CONFIG.INSTAGRAM}
+const SET={free_above:"FREE_ABOVE",fee:"FEE",sameday_fee:"SAMEDAY_FEE",sameday_cutoff:"SAMEDAY_CUTOFF",sameday_by:"SAMEDAY_BY",standard_eta:"STANDARD_ETA",whatsapp:"WHATSAPP",instagram:"INSTAGRAM"};
+async function loadCatalog(){
+  if(!sb){clean();paintGrid();return}
+  const c=ls.get("zb_cat",null);
+  if(c){PRODUCTS=c.products;Object.assign(CONFIG,c.cfg);clean()}else{PRODUCTS=[];loading=true}
+  applyCfg();paintGrid();
+  try{
+    const [pr,st]=await Promise.all([sb.from("products").select("*").eq("active",true).order("sort"),sb.from("settings").select("*").eq("id",1).maybeSingle()]);
+    if(pr.error)throw pr.error;
+    PRODUCTS=pr.data.map(r=>({id:r.id,name:r.name,cat:r.cat||"hijab",price:r.price,was:r.compare_price||0,c1:r.c1||"#f3dce3",c2:r.c2||"#e8b4c2",fabric:r.fabric||"",desc:r.description||"",img:r.image_url||"",stock:r.in_stock!==false}));
+    const cfg={};if(st.data)Object.entries(SET).forEach(([k,n])=>{const v=st.data[k];if(v!==null&&v!==undefined&&v!=="")cfg[n]=v});
+    Object.assign(CONFIG,cfg);ls.set("zb_cat",{products:PRODUCTS,cfg});
+  }catch{if(!PRODUCTS.length)PRODUCTS=FALLBACK}
+  loading=false;clean();applyCfg();paintGrid();
+}
+
+/* ---------- boot ---------- */
+applyCfg();paintBadges();reveal(".val,.visit");loadCatalog();
+if(sb){
+  sb.auth.getSession().then(({data})=>{session=data.session;user=session?.user||null});
+  sb.auth.onAuthStateChange((_e,s)=>{session=s;user=s?.user||null;if(view&&$("#st").textContent.match(/Welcome|Account/))openSheet(user?"Account":"Welcome",accountView,accountMount)});
+}
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>

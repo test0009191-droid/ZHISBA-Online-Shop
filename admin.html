@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>ZHISBA Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<style>
+:root{--bg:#faf6f2;--card:#fff;--ink:#2a2024;--muted:#8a7a80;--rose:#b8536b;--pink:#f3dce3;--line:rgba(42,32,36,.1);--err:#c0392b;--ok:#2d8a52;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#171114;--card:#231a1e;--ink:#f6eef1;--muted:#a8959c;--rose:#e58aa2;--pink:#3a2530;--line:rgba(255,255,255,.12);--err:#ff7b6b;--ok:#5fd08a}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:calc(env(safe-area-inset-top) + 12px) 16px calc(40px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto;line-height:1.45}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+h1{font:700 22px "Playfair Display",Georgia,serif;color:var(--rose);letter-spacing:2px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:8px 0 14px}
+.btn{display:block;width:100%;background:var(--rose);color:#fff;padding:14px;border-radius:14px;font-weight:600;font-size:16px;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.btn:active{transform:scale(.97)}.btn.alt{background:var(--pink);color:var(--rose)}.btn.del{background:none;color:var(--err)}.btn:disabled{opacity:.55}
+.sm{padding:8px 14px;border-radius:12px;background:var(--pink);color:var(--rose);font-size:13.5px;font-weight:600}
+.seg{display:flex;background:var(--pink);border-radius:14px;padding:3px;margin-bottom:16px}.seg button{flex:1;padding:10px;border-radius:11px;font-weight:600;font-size:14px;color:var(--rose)}.seg button.on{background:var(--card)}
+.box{background:var(--card);border-radius:22px;padding:22px;margin-top:40px}.box p{color:var(--muted);font-size:14px;margin:8px 0}
+.f{margin:12px 0}.f label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 5px 4px}
+.f input,.f select,.f textarea{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+.f textarea{resize:vertical;min-height:84px}.f small{color:var(--muted);font-size:12px;margin-left:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border-radius:18px;padding:10px;margin-bottom:10px}
+.th{width:60px;height:60px;border-radius:14px;background:var(--pink);flex:none;display:grid;place-items:center;overflow:hidden;font-size:22px}.th img{width:100%;height:100%;object-fit:cover}
+.rm{flex:1;min-width:0}.rm b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rm small{color:var(--muted);font-size:13px}.row>span{color:var(--muted);font-size:20px}
+.msg{font-size:13px;min-height:18px;text-align:center}.msg.e{color:var(--err)}.msg.o{color:var(--ok)}
+#ed{position:fixed;inset:0;background:var(--bg);z-index:10;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(40px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .45s cubic-bezier(.32,.72,0,1)}
+#ed.open{transform:none}#ed>div{max-width:640px;margin:0 auto}
+.ph{display:block;aspect-ratio:1;max-height:300px;width:100%;border-radius:22px;background:var(--pink);overflow:hidden;display:grid;place-items:center;color:var(--rose);font-weight:600;text-align:center;cursor:pointer}.ph img{width:100%;height:100%;object-fit:cover}
+.sw{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-top:1px solid var(--line)}.sw input{width:22px;height:22px;accent-color:var(--rose)}
+.ord{background:var(--card);border-radius:18px;padding:14px;margin-bottom:10px;font-size:14px}.ord .h{display:flex;justify-content:space-between;font-weight:600}
+.ord small{display:block;color:var(--muted);margin-top:3px}.ord a{color:var(--rose);font-weight:600}.ord select{margin-top:10px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px}
+.tg{display:inline-block;background:var(--rose);color:#fff;border-radius:8px;padding:1px 8px;font-size:11.5px;margin-left:6px}
+code{display:block;background:var(--pink);border-radius:12px;padding:12px;font-size:12.5px;word-break:break-all;margin:10px 0;color:var(--ink)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:20}#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="ed"></div><div id="toast"></div>
+<script>
+const SUPABASE_URL="YOUR_SUPABASE_URL", SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"; // same two values as in index.html
+const sb=(SUPABASE_URL.startsWith("http")&&window.supabase)?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const $=s=>document.querySelector(s),app=$("#app"),inr=n=>"₹"+Number(n).toLocaleString("en-IN");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let products=[],settings={},orders=[],tab="products",form=null;
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)}
+
+/* ---- login ---- */
+function showLogin(mode="login"){
+  app.innerHTML=`<div class="box"><h1>ZHISBA Admin</h1><p>${mode==="login"?"Log in to manage your shop.":"Create your owner account (first time only)."}</p>
+  <div class="f"><label>Email</label><input id="em" type="email" autocomplete="email"></div><div class="f"><label>Password</label><input id="pw" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}"></div>
+  <button class="btn" id="go">${mode==="login"?"Log in":"Create account"}</button><p class="msg" id="m"></p>
+  <button class="sm" id="sw" style="margin:0 auto;display:block">${mode==="login"?"First time? Create account":"I have an account"}</button></div>`;
+  $("#sw").onclick=()=>showLogin(mode==="login"?"signup":"login");
+  $("#go").onclick=async()=>{const m=$("#m"),email=$("#em").value.trim(),password=$("#pw").value;m.className="msg";m.textContent="Please wait…";
+    const r=mode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+    if(r.error){m.textContent=r.error.message;m.className="msg e";return}
+    if(!r.data.session){m.textContent="Check your email and tap the confirm link, then log in here.";m.className="msg o";return}
+    enter(r.data.user)};
+}
+async function enter(user){
+  const {data}=await sb.from("admins").select("user_id").eq("user_id",user.id);
+  if(!data||!data.length){
+    const line=`insert into public.admins (user_id) values ('${user.id}');`;
+    app.innerHTML=`<div class="box"><h1>One last step</h1><p>You're logged in, but this account isn't an admin yet. Copy the line below, paste it into Supabase → SQL Editor, press Run, then come back and refresh.</p><code id="ln">${esc(line)}</code><button class="btn alt" id="cp">Copy line</button><button class="btn del" id="lo" style="margin-top:8px">Log out</button></div>`;
+    $("#cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(line);toast("Copied")};$("#lo").onclick=logout;return}
+  await loadAll();render();
+}
+const logout=async()=>{await sb.auth.signOut();showLogin()};
+
+/* ---- data ---- */
+async function loadAll(){
+  const [p,s,o]=await Promise.all([sb.from("products").select("*").order("sort"),sb.from("settings").select("*").eq("id",1).maybeSingle(),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(40)]);
+  products=p.data||[];settings=s.data||{id:1};orders=o.data||[];
+}
+
+/* ---- main screen ---- */
+function render(){
+  const v=tab==="products"?productsView():tab==="orders"?ordersView():settingsView();
+  app.innerHTML=`<div class="top"><h1>ZHISBA</h1><div><a class="sm" href="index.html" style="text-decoration:none;margin-right:6px">View shop</a><button class="sm" id="lo">Log out</button></div></div>
+  <div class="seg"><button data-t="products" class="${tab==="products"?"on":""}">Products</button><button data-t="orders" class="${tab==="orders"?"on":""}">Orders</button><button data-t="settings" class="${tab==="settings"?"on":""}">Shop settings</button></div>${v}`;
+  $("#lo").onclick=logout;
+  app.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
+  app.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEditor(b.dataset.edit));
+  const add=$("#add");if(add)add.onclick=()=>openEditor(null);
+  const ss=$("#ss");if(ss)ss.onclick=saveSettings;
+  app.querySelectorAll("[data-st]").forEach(s=>s.onchange=async()=>{const {error}=await sb.from("orders").update({status:s.value}).eq("id",s.dataset.st);toast(error?"Could not update":"Order updated")});
+}
+function productsView(){
+  return`<button class="btn" id="add" style="margin-bottom:14px">+ Add a product</button>`+(products.length?products.map(p=>`<button class="row" data-edit="${esc(p.id)}"><div class="th">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:"📷"}</div><div class="rm"><b>${esc(p.name)}</b><small>${inr(p.price)}${p.compare_price>p.price?` <s>${inr(p.compare_price)}</s>`:""}${p.in_stock===false?" · Sold out":""}${p.active===false?" · Hidden":""}</small></div><span>›</span></button>`).join(""):`<p class="msg">No products yet. Tap “Add a product”.</p>`);
+}
+function ordersView(){
+  if(!orders.length)return`<p class="msg">No orders yet.</p>`;
+  return orders.map(o=>{const same=o.delivery==="same_day";return`<div class="ord"><div class="h"><span>${esc(o.customer_name)}${same?`<span class="tg">Same day ⚡</span>`:""}</span><span>${inr(o.amount)}</span></div>
+  <small>${esc(new Date(o.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}))} · ${o.status==="created"?"Not paid yet":"Paid"}</small>
+  <small>${esc((o.items||[]).map(i=>((products.find(p=>p.id===i.id)||{}).name||i.id)+" ×"+i.qty).join(", "))}</small>
+  <small>${esc(o.address)}, ${esc(o.pincode)}</small><small><a href="tel:${esc(o.phone)}">Call ${esc(o.phone)}</a> · <a href="https://wa.me/91${esc(o.phone)}" target="_blank" rel="noopener">WhatsApp</a></small>
+  <select data-st="${esc(o.id)}">${["created","paid","shipped","delivered"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s[0].toUpperCase()+s.slice(1)}</option>`).join("")}</select></div>`}).join("");
+}
+function settingsView(){
+  const f=(k,l,t="number",h="")=>`<div class="f"><label>${l}</label><input id="s_${k}" type="${t}" ${t==="number"?'inputmode="numeric"':""} value="${esc(settings[k]??"")}">${h?`<small>${h}</small>`:""}</div>`;
+  return`<div class="box" style="margin-top:0"><div class="g2">${f("fee","Delivery charge (₹)")}${f("free_above","Free delivery above (₹)")}</div>
+  <div class="g2">${f("sameday_fee","Same-day charge (₹)")}${f("sameday_cutoff","Same-day cutoff hour","number","15 = 3 PM")}</div>
+  ${f("sameday_by","Same-day arrives by","text")}${f("standard_eta","Standard delivery time","text")}${f("whatsapp","WhatsApp number","text","e.g. 919876543210")}${f("instagram","Instagram handle","text")}
+  <button class="btn" id="ss">Save settings</button></div>`;
+}
+async function saveSettings(){
+  const n=k=>{const v=$("#s_"+k).value.trim();return v===""?null:Number(v)},t=k=>$("#s_"+k).value.trim();
+  const row={id:1,fee:n("fee"),free_above:n("free_above"),sameday_fee:n("sameday_fee"),sameday_cutoff:n("sameday_cutoff"),sameday_by:t("sameday_by"),standard_eta:t("standard_eta"),whatsapp:t("whatsapp"),instagram:t("instagram")};
+  if([row.fee,row.free_above,row.sameday_fee,row.sameday_cutoff].some(x=>x===null||isNaN(x)||x<0))return toast("Check the number fields");
+  const {error}=await sb.from("settings").upsert(row);if(error)return toast("Could not save: "+error.message);settings=row;toast("Settings saved ✓");
+}
+
+/* ---- product editor ---- */
+function openEditor(id){
+  const p=id?products.find(x=>x.id===id):null,isNew=!p;
+  form=p?{...p}:{id:"p"+Math.random().toString(36).slice(2,7),name:"",cat:"hijab",price:"",compare_price:"",fabric:"",description:"",in_stock:true,active:true,sort:(products.length?Math.max(...products.map(x=>x.sort||0))+1:1),image_url:""};
+  const ed=$("#ed");
+  ed.innerHTML=`<div><div class="top"><button class="sm" id="cx">Cancel</button><b>${isNew?"New product":"Edit product"}</b><span style="width:70px"></span></div>
+  <label class="ph" id="phb">${form.image_url?`<img src="${esc(form.image_url)}" alt="">`:"📷<br>Tap to add a photo"}<input type="file" accept="image/*" id="file" hidden></label>
+  <p class="msg" id="pm">Choose from your gallery or take a new photo.</p>
+  <div class="f"><label>Name</label><input id="e_name" value="${esc(form.name)}"></div>
+  <div class="g2"><div class="f"><label>Price you sell at (₹)</label><input id="e_price" type="number" inputmode="numeric" value="${esc(form.price)}"></div>
+  <div class="f"><label>Old price (₹)</label><input id="e_old" type="number" inputmode="numeric" value="${esc(form.compare_price??"")}"><small>Fill this for a discount</small></div></div>
+  <div class="g2"><div class="f"><label>Type</label><select id="e_cat"><option value="hijab" ${form.cat==="hijab"?"selected":""}>Hijab</option><option value="hamper" ${form.cat==="hamper"?"selected":""}>Hamper</option></select></div>
+  <div class="f"><label>Fabric</label><input id="e_fab" value="${esc(form.fabric)}"></div></div>
+  <div class="f"><label>Description</label><textarea id="e_desc">${esc(form.description)}</textarea></div>
+  <div class="f"><label>Show order (1 shows first)</label><input id="e_sort" type="number" inputmode="numeric" value="${esc(form.sort)}"></div>
+  <div class="sw"><span>In stock</span><input type="checkbox" id="e_stock" ${form.in_stock!==false?"checked":""}></div>
+  <div class="sw"><span>Visible in shop</span><input type="checkbox" id="e_act" ${form.active!==false?"checked":""}></div>
+  <button class="btn" id="sv" style="margin-top:16px">Save product</button>${isNew?"":`<button class="btn del" id="rmv">Delete product</button>`}</div>`;
+  requestAnimationFrame(()=>ed.classList.add("open"));ed.scrollTop=0;document.body.style.overflow="hidden";
+  $("#cx").onclick=closeEditor;$("#file").onchange=e=>e.target.files[0]&&upload(e.target.files[0]);$("#sv").onclick=()=>saveProduct(isNew);
+  const r=$("#rmv");if(r)r.onclick=async()=>{if(!confirm("Delete this product for good? To just hide it, switch off “Visible in shop” instead."))return;
+    const {error}=await sb.from("products").delete().eq("id",form.id);if(error)return toast("Could not delete");products=products.filter(x=>x.id!==form.id);closeEditor();render();toast("Deleted")};
+}
+function closeEditor(){const ed=$("#ed");ed.classList.remove("open");document.body.style.overflow="";form=null}
+async function toJpeg(file){
+  let b;try{b=await createImageBitmap(file,{imageOrientation:"from-image"})}catch{b=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(file)})}
+  const w=b.width||b.naturalWidth,h=b.height||b.naturalHeight,k=Math.min(1,1400/Math.max(w,h)),c=document.createElement("canvas");
+  c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext("2d").drawImage(b,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(r,"image/jpeg",.85));
+}
+async function upload(file){
+  const m=$("#pm");m.className="msg";m.textContent="Uploading photo…";
+  try{
+    const blob=await toJpeg(file),path=`${form.id}-${Date.now()}.jpg`;
+    const {error}=await sb.storage.from("product-images").upload(path,blob,{contentType:"image/jpeg",upsert:true});if(error)throw error;
+    form.image_url=sb.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+    $("#phb").innerHTML=`<img src="${esc(form.image_url)}" alt=""><input type="file" accept="image/*" id="file" hidden>`;$("#file").onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+    m.textContent="Photo uploaded. Tap Save product to keep it.";m.className="msg o";
+  }catch(e){m.textContent="Upload failed: "+(e.message||"try a smaller photo");m.className="msg e"}
+}
+async function saveProduct(isNew){
+  const price=Math.round(Number($("#e_price").value)),old=$("#e_old").value.trim()===""?null:Math.round(Number($("#e_old").value)),name=$("#e_name").value.trim();
+  if(name.length<2)return toast("Enter a product name");
+  if(!(price>0))return toast("Enter a price above 0");
+  if(old!==null&&old<=price)return toast("Old price must be higher than the selling price");
+  const row={name,cat:$("#e_cat").value,price,compare_price:old,fabric:$("#e_fab").value.trim(),description:$("#e_desc").value.trim(),sort:Number($("#e_sort").value)||100,in_stock:$("#e_stock").checked,active:$("#e_act").checked,image_url:form.image_url||null};
+  const btn=$("#sv");btn.disabled=true;btn.textContent="Saving…";
+  const {error}=isNew?await sb.from("products").insert({id:form.id,...row}):await sb.from("products").update(row).eq("id",form.id);
+  btn.disabled=false;btn.textContent="Save product";
+  if(error)return toast("Could not save: "+error.message);
+  const i=products.findIndex(x=>x.id===form.id),full={...(i>=0?products[i]:{id:form.id}),...row};
+  i>=0?products[i]=full:products.push(full);products.sort((a,b)=>(a.sort||0)-(b.sort||0));
+  closeEditor();render();toast("Saved ✓ It's live on your shop");
+}
+
+if(!sb){app.innerHTML='<div class="box"><h1>Almost there</h1><p>Open admin.html in a text editor and paste your Supabase URL and anon key at the top of the script, then upload it again. If you already did, check your internet connection and refresh.</p></div>'}
+else sb.auth.getSession().then(({data})=>data.session?enter(data.session.user):showLogin());
+</script>
+</body>
+</html>
